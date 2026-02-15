@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Movie Date 💗</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      /* Premium pink background: softer + less saturated */
+      --bgA:#fff7fb;
+      --bgB:#f4d8e6;
+      --bloom:#ffffff;
+
+      --ink:#121015;
+      --inkSoft: rgba(18,16,21,.72);
+
+      /* Premium button pinks */
+      --btnLight:#e58aaa;   /* default */
+      --btnDark:#a0124d;    /* selected */
+      --btnText:#fff;
+
+      --border:#c41a5f;
+      --shadow: 0 18px 60px rgba(0,0,0,.08);
+
+      --radiusBig: 44px;
+      --radiusBtn: 12px;
+
+      /* Rhythm */
+      --gap: 18px;
+      --gapLg: 26px;
+    }
+
+    *{box-sizing:border-box}
+    html, body {height:100%;}
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        radial-gradient(980px 520px at 30% 18%, rgba(255,255,255,.9), transparent 62%),
+        radial-gradient(900px 620px at 74% 55%, rgba(255,255,255,.55), transparent 66%),
+        linear-gradient(180deg, var(--bgB), var(--bgA));
+      overflow-x:hidden;
+      font-family: "Playfair Display", Georgia, serif;
+    }
+
+    /* Countdown corner tag (premium, minimal) */
+    .cornerHud{
+      position:fixed;
+      top:0;
+      right:0;
+      z-index:20;
+      font-size:12px;
+      color:rgba(18,16,21,.62);
+      background:rgba(255,255,255,.62);
+      border-left:1px solid rgba(0,0,0,.12);
+      border-bottom:1px solid rgba(0,0,0,.12);
+      border-radius: 0 0 0 18px;
+      padding:10px 12px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,.06);
+    }
+
+    /* Colored floating icons (subtle but obvious) */
+    .loveLayer{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      opacity:.58;
+    }
+    .love{
+      position:absolute;
+      font-size: 18px;
+      animation: floaty 11s ease-in-out infinite;
+      transform: translateZ(0);
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,.05));
+    }
+    .love:nth-child(2){animation-duration: 13s}
+    .love:nth-child(3){animation-duration: 15s}
+    .love:nth-child(4){animation-duration: 12s}
+    .love:nth-child(5){animation-duration: 14s}
+    .love:nth-child(6){animation-duration: 16s}
+
+    @keyframes floaty{
+      0%{transform: translateY(0) translateX(0) rotate(0deg);}
+      50%{transform: translateY(-14px) translateX(10px) rotate(6deg);}
+      100%{transform: translateY(0) translateX(0) rotate(0deg);}
+    }
+
+    /* Confetti canvas */
+    canvas#confetti{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:50;
+      opacity:0;
+      transition: opacity .2s ease;
+    }
+
+    /* Full screen sections */
+    section{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 44px 18px;
+      position:relative;
+      z-index:1;
+    }
+
+    /* thin divider like your design */
+    section::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom: 64px;
+      transform: translateX(-50%);
+      width: min(760px, 82vw);
+      height: 1px;
+      background: rgba(18,16,21,.58);
+      opacity:.7;
+    }
+
+    .wrap{
+      width: min(980px, 100%);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      text-align:center;
+      gap: var(--gap);
+    }
+
+    /* Type */
+    .kicker{
+      font-size: clamp(26px, 3.2vw, 52px);
+      font-weight:400;
+      margin:0;
+      letter-spacing: .2px;
+    }
+    .script{
+      font-family:"Great Vibes", cursive;
+      font-size: clamp(52px, 6.8vw, 112px);
+      font-weight: 400;
+      margin: -10px 0 0;
+      line-height: .95;
+    }
+    .scriptSmall{
+      font-family:"Great Vibes", cursive;
+      font-size: clamp(44px, 5vw, 86px);
+      font-weight: 400;
+      margin:0;
+      line-height: .95;
+    }
+    .sub{
+      margin:0;
+      font-size: clamp(15px, 1.55vw, 22px);
+      color: var(--inkSoft);
+      line-height: 1.6;
+    }
+
+    /* Buttons (premium sizing) */
+    .btnRow{
+      display:flex;
+      gap: 14px;
+      margin-top: 6px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    .btn{
+      width: 320px;                 /* desktop-ish */
+      max-width: 86vw;
+      height: 60px;
+      border-radius: var(--radiusBtn);
+      border: 0;
+      cursor:pointer;
+      font-family:"Playfair Display", Georgia, serif;
+      font-size: 28px;
+      letter-spacing:.2px;
+      color: var(--btnText);
+      background: var(--btnLight);
+      box-shadow: 0 12px 30px rgba(0,0,0,.10);
+      transition: transform .15s ease, filter .15s ease, background .15s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); filter: brightness(.99); }
+    .btn.selected{ background: var(--btnDark); }
+
+    /* Movie buttons */
+    .movieStack{
+      display:flex;
+      flex-direction:column;
+      gap: 18px;
+      align-items:center;
+      margin-top: 6px;
+    }
+    .movieBtn{
+      width: 520px;
+      max-width: 86vw;
+      height: 74px;
+      border-radius: 12px;
+      border: 0;
+      cursor:pointer;
+      font-family:"Playfair Display", Georgia, serif;
+      font-size: clamp(22px, 2vw, 38px);
+      color: #fff;
+      background: var(--btnLight);
+      box-shadow: 0 12px 30px rgba(0,0,0,.10);
+      transition: transform .15s ease, background .15s ease;
+    }
+    .movieBtn:hover{ transform: translateY(-1px); }
+    .movieBtn.selected{ background: var(--btnDark); }
+
+    /* 24h typable time input */
+    .timeWrap{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap: 10px;
+      margin-top: 2px;
+    }
+    .timeInput{
+      width: 320px;
+      max-width: 86vw;
+      text-align:center;
+      font-family:"Playfair Display", Georgia, serif;
+      font-size: clamp(20px, 2vw, 36px);
+      padding: 16px 16px;
+      border-radius: 12px;
+      border: 2px solid var(--border);
+      background: rgba(255,255,255,.86);
+      color: rgba(18,16,21,.85);
+      box-shadow: 0 12px 30px rgba(0,0,0,.06);
+      outline:none;
+    }
+    .hint{
+      font-size: 13px;
+      color: rgba(18,16,21,.55);
+      margin:0;
+    }
+
+    /* End actions */
+    .endActions{
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+      width: 420px;
+      max-width: 86vw;
+      margin-top: 4px;
+    }
+    .miniBtn{
+      height: 54px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,.14);
+      background: rgba(255,255,255,.72);
+      cursor:pointer;
+      font-family:"Playfair Display", Georgia, serif;
+      font-size: 18px;
+      color: rgba(18,16,21,.80);
+      box-shadow: 0 10px 26px rgba(0,0,0,.06);
+      transition: transform .15s ease;
+    }
+    .miniBtn:hover{ transform: translateY(-1px); }
+
+    .note{
+      font-size: 13px;
+      color: rgba(18,16,21,.55);
+      max-width: 70ch;
+      margin: 0;
+      min-height: 18px;
+    }
+
+    /* Reveal */
+    .reveal{
+      opacity:0;
+      transform: translateY(8px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .reveal.show{
+      opacity:1;
+      transform: translateY(0);
+    }
+
+    /* Premium mobile sizing: smaller, tighter, not oversized */
+    @media (max-width: 520px){
+      :root{
+        --gap: 14px;
+        --gapLg: 20px;
+      }
+
+      section{ padding: 34px 14px; }
+      section::after{ bottom: 44px; width: 84vw; }
+
+      .kicker{ font-size: 26px; }
+      .script{ font-size: 56px; }
+      .scriptSmall{ font-size: 46px; }
+      .sub{ font-size: 15px; }
+
+      /* Buttons feel premium: not full width, centered, slimmer */
+      .btn{
+        width: 260px;
+        max-width: 78vw;
+        height: 52px;
+        font-size: 22px;
+        border-radius: 12px;
+      }
+
+      .movieBtn{
+        width: 300px;
+        max-width: 82vw;
+        height: 62px;
+        font-size: 20px;
+      }
+
+      .timeInput{
+        width: 240px;
+        max-width: 78vw;
+        padding: 14px 14px;
+        font-size: 20px;
+      }
+
+      .endActions{
+        width: 320px;
+        max-width: 86vw;
+      }
+      .miniBtn{ height: 50px; font-size: 16px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="cornerHud" id="countHud">starts soon</div>
+
+  <!-- colored icons -->
+  <div class="loveLayer" aria-hidden="true">
+    <div class="love" style="left:7%; top:12%; color: rgba(160,18,77,.55);">♥</div>
+    <div class="love" style="left:88%; top:16%; color: rgba(229,138,170,.55);">♡</div>
+    <div class="love" style="left:13%; top:74%; color: rgba(196,26,95,.45);">✿</div>
+    <div class="love" style="left:84%; top:78%; color: rgba(182,144,161,.55);">♥</div>
+    <div class="love" style="left:52%; top:10%; color: rgba(160,18,77,.40);">♡</div>
+    <div class="love" style="left:46%; top:86%; color: rgba(229,138,170,.42);">♥</div>
+  </div>
+
+  <canvas id="confetti"></canvas>
+
+  <!-- 1) INTRO -->
+  <section id="intro">
+    <div class="wrap reveal">
+      <h1 class="kicker">Hi <span id="herName">Kinah</span>!</h1>
+      <div class="script">Movie Date?</div>
+      <p class="sub">Would you kindly join me on a virtual movie date?</p>
+
+      <div class="btnRow">
+        <button class="btn selected" id="yesBtn">Yes!</button>
+        <button class="btn" id="superYesBtn">Super, Yes!</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2) MOVIE -->
+  <section id="movie">
+    <div class="wrap reveal">
+      <h2 class="scriptSmall">Choose The Movie</h2>
+      <div class="movieStack" id="movieStack"></div>
+
+      <div class="btnRow">
+        <button class="btn selected" id="movieNextBtn" style="width:260px;max-width:78vw;height:52px;font-size:20px;">Next</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3) TIME -->
+  <section id="time">
+    <div class="wrap reveal">
+      <h2 class="scriptSmall">Your Time, Please!</h2>
+
+      <div class="timeWrap">
+        <input
+          class="timeInput"
+          id="timeInput"
+          list="timeSuggestions"
+          inputmode="numeric"
+          placeholder="10:00"
+          value="10:00"
+          aria-label="Time in 24-hour format"
+        />
+        <datalist id="timeSuggestions"></datalist>
+        <p class="hint">24-hour format (HH:MM). Example: 18:30</p>
+      </div>
+
+      <div class="btnRow">
+        <button class="btn selected" id="timeNextBtn" style="width:260px;max-width:78vw;height:52px;font-size:20px;">Next</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4) END -->
+  <section id="end">
+    <div class="wrap reveal">
+      <h2 class="scriptSmall">All Set 💗</h2>
+      <p class="sub">Copy the link, add to your calendar, and we’re good.</p>
+
+      <div class="endActions">
+        <button class="miniBtn" id="copyPageBtn">Copy Page Link</button>
+        <a class="miniBtn" id="googleCalBtn" href="#" target="_blank" rel="noreferrer"
+           style="display:flex;align-items:center;justify-content:center;text-decoration:none;">
+          Add to Google Calendar
+        </a>
+        <button class="miniBtn" id="icsBtn">Download .ics</button>
+        <button class="miniBtn" id="copyInviteBtn">Copy Invite Text</button>
+      </div>
+
+      <p class="note" id="toast"></p>
+      <p class="note">Meet link is already set.</p>
+    </div>
+  </section>
+
+  <script>
+    const CONFIG = {
+      herName: "Kinah",
+      dateLabel: "Feb. 15th",
+      dateISO: "2026-02-15", // used with 24h input
+      meetLink: "https://meet.google.com/pto-ghqv-hwx",
+      movieOptions: [
+        { label: "Entergalactic", selected: true },
+        { label: "All The Bright Places", selected: false },
+        { label: "The Perfect Find", selected: false }
+      ],
+      timeSuggestions24h: ["10:00","10:30","11:00","11:30","12:00","18:00","19:00","20:00","21:00"]
+    };
+
+    const $ = (id) => document.getElementById(id);
+    $("herName").textContent = CONFIG.herName;
+
+    // Populate time suggestions
+    const dl = $("timeSuggestions");
+    CONFIG.timeSuggestions24h.forEach(t=>{
+      const o = document.createElement("option");
+      o.value = t;
+      dl.appendChild(o);
+    });
+
+    // Smooth scroll
+    function goTo(id){
+      const el = document.querySelector(id);
+      if(!el) return;
+      el.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+
+    // Confetti
+    const canvas = $("confetti");
+    const ctx = canvas.getContext("2d");
+    let confetti = [];
+    let raf = null;
+
+    function resize(){
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    function burstConfetti(){
+      canvas.style.opacity = 1;
+      confetti = Array.from({length: 140}, () => ({
+        x: Math.random()*canvas.width,
+        y: -20 - Math.random()*160,
+        vx: -1.4 + Math.random()*2.8,
+        vy: 2.6 + Math.random()*4.4,
+        r: 2 + Math.random()*4,
+        rot: Math.random()*Math.PI,
+        vr: -0.12 + Math.random()*0.24,
+        life: 80 + Math.random()*90
+      }));
+      if(raf) cancelAnimationFrame(raf);
+      animateConfetti();
+    }
+    function animateConfetti(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      confetti.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life -= 1;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = "rgba(255,255,255,.95)";
+        ctx.fillRect(-p.r, -p.r*0.6, p.r*2.2, p.r*1.2);
+        ctx.restore();
+      });
+      confetti = confetti.filter(p => p.life > 0 && p.y < canvas.height + 30);
+      if(confetti.length){
+        raf = requestAnimationFrame(animateConfetti);
+      }else{
+        canvas.style.opacity = 0;
+      }
+    }
+
+    // Reveal
+    const obs = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting) e.target.classList.add("show");
+      });
+    }, {threshold: .25});
+    document.querySelectorAll(".reveal").forEach(el=>obs.observe(el));
+
+    // Intro button selected states
+    const yesBtn = $("yesBtn");
+    const superYesBtn = $("superYesBtn");
+    function setSelected(btnA, btnB, which){
+      btnA.classList.toggle("selected", which === "A");
+      btnB.classList.toggle("selected", which === "B");
+    }
+    yesBtn.addEventListener("click", ()=>{
+      setSelected(yesBtn, superYesBtn, "A");
+      burstConfetti();
+      goTo("#movie");
+    });
+    superYesBtn.addEventListener("click", ()=>{
+      setSelected(yesBtn, superYesBtn, "B");
+      burstConfetti();
+      goTo("#movie");
+    });
+
+    // Movie selection
+    const movieStack = $("movieStack");
+    let selectedMovie = CONFIG.movieOptions.find(m=>m.selected)?.label || CONFIG.movieOptions[0]?.label || "";
+    CONFIG.movieOptions.forEach(opt=>{
+      const b = document.createElement("button");
+      b.className = "movieBtn" + (opt.selected ? " selected" : "");
+      b.textContent = opt.label;
+      b.addEventListener("click", ()=>{
+        movieStack.querySelectorAll(".movieBtn").forEach(x=>x.classList.remove("selected"));
+        b.classList.add("selected");
+        selectedMovie = opt.label;
+        updateCalendarLinks();
+      });
+      movieStack.appendChild(b);
+    });
+
+    $("movieNextBtn").addEventListener("click", ()=> goTo("#time"));
+    $("timeNextBtn").addEventListener("click", ()=> goTo("#end"));
+
+    // 24h time validation + calendar/counter updates
+    const timeInput = $("timeInput");
+    function normalizeTime(val){
+      const v = String(val || "").trim();
+      const m = v.match(/^([01]\d|2[0-3]):([0-5]\d)$/);
+      return m ? `${m[1]}:${m[2]}` : "";
+    }
+    function getStartDate(){
+      const t = normalizeTime(timeInput.value) || "10:00";
+      return new Date(`${CONFIG.dateISO}T${t}:00`);
+    }
+    timeInput.addEventListener("input", ()=>{
+      const ok = !!normalizeTime(timeInput.value);
+      timeInput.style.borderColor = ok || timeInput.value === "" ? "var(--border)" : "rgba(220,0,0,.6)";
+      updateCalendarLinks();
+      tick();
+    });
+
+    // Countdown corner
+    function tick(){
+      const hud = $("countHud");
+      const start = getStartDate().getTime();
+      const now = Date.now();
+      const diff = start - now;
+      if(diff <= 0){ hud.textContent = "it’s time 🎬"; return; }
+
+      const mins = Math.floor(diff/60000);
+      const hrs = Math.floor(mins/60);
+      const days = Math.floor(hrs/24);
+      const rH = hrs % 24;
+      const rM = mins % 60;
+      hud.textContent = `starts in ${days}d ${String(rH).padStart(2,"0")}h ${String(rM).padStart(2,"0")}m`;
+    }
+    tick();
+    setInterval(tick, 30000);
+
+    // Toast + copy
+    function toast(msg){
+      $("toast").textContent = msg;
+      setTimeout(()=> $("toast").textContent = "", 4200);
+    }
+    async function copy(text){
+      try{ await navigator.clipboard.writeText(text); toast("Copied ✅"); }
+      catch(e){ toast("Copy failed. Copy manually."); }
+    }
+
+    // Calendar
+    function toICSDate(d){
+      const utc = new Date(d.getTime() - d.getTimezoneOffset()*60000);
+      return utc.toISOString().replace(/[-:]/g,"").split(".")[0] + "Z";
+    }
+    function escapeICS(s){
+      return String(s||"")
+        .replaceAll("\\","\\\\")
+        .replaceAll("\n","\\n")
+        .replaceAll(",","\\,")
+        .replaceAll(";","\\;");
+    }
+
+    function updateCalendarLinks(){
+      const start = getStartDate();
+      const end = new Date(start.getTime() + 2*60*60*1000);
+
+      const title = `Movie Date with ${CONFIG.herName}`;
+      const details = `Movie: ${selectedMovie}\nMeet link: ${CONFIG.meetLink}`;
+      const location = CONFIG.meetLink;
+
+      const url = new URL("https://calendar.google.com/calendar/render");
+      url.searchParams.set("action","TEMPLATE");
+      url.searchParams.set("text", title);
+      url.searchParams.set("dates", `${toICSDate(start)}/${toICSDate(end)}`);
+      url.searchParams.set("details", details);
+      url.searchParams.set("location", location);
+
+      $("googleCalBtn").href = url.toString();
+    }
+    updateCalendarLinks();
+
+    $("copyPageBtn").addEventListener("click", ()=> copy(window.location.href));
+
+    $("copyInviteBtn").addEventListener("click", ()=>{
+      const t = normalizeTime(timeInput.value) || "10:00";
+      const text =
+`Movie Date 💗
+For: ${CONFIG.herName}
+When: ${CONFIG.dateLabel} • ${t}
+Movie: ${selectedMovie}
+Meet: ${CONFIG.meetLink}`;
+      copy(text);
+    });
+
+    $("icsBtn").addEventListener("click", ()=>{
+      const start = getStartDate();
+      const end = new Date(start.getTime() + 2*60*60*1000);
+
+      const uid = `movie-date-${Date.now()}@invite`;
+      const title = `Movie Date with ${CONFIG.herName}`;
+      const desc = `Movie: ${selectedMovie}\nMeet link: ${CONFIG.meetLink}`;
+      const loc = CONFIG.meetLink;
+
+      const ics =
+`BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//MovieDate//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:${uid}
+DTSTAMP:${toICSDate(new Date())}
+DTSTART:${toICSDate(start)}
+DTEND:${toICSDate(end)}
+SUMMARY:${escapeICS(title)}
+DESCRIPTION:${escapeICS(desc)}
+LOCATION:${escapeICS(loc)}
+END:VEVENT
+END:VCALENDAR`;
+
+      const blob = new Blob([ics], {type:"text/calendar;charset=utf-8"});
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "movie-date.ics";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 1500);
+      toast("Downloaded .ics ✅");
+    });
+  </script>
+</body>
+</html>
